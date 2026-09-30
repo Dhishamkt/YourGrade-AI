@@ -17,6 +17,10 @@ def process_marks(file, student_name=None):
             return {"error": "File is empty!"}
 
         numeric_cols = df.select_dtypes(include="number").columns.tolist()
+        numeric_cols = [c for c in numeric_cols if c.lower() not in ["roll", "roll no", "rollno", "roll number", "id", "s.no", "sno", "sl no"]]
+        if not numeric_cols:
+            return {"error": "No numeric marks columns found in the file!"}
+        df[numeric_cols] = df[numeric_cols].fillna(0)
         
         name_col = None
         for col in df.columns:

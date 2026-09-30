@@ -8,7 +8,11 @@ load_dotenv()
 
 analyze_bp = Blueprint("analyze", __name__)
 
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+def get_client():
+    key = os.environ.get("GROQ_API_KEY")
+    if not key:
+        return None
+    return Groq(api_key=key, timeout=45)
 
 @analyze_bp.route("/analyze", methods=["POST"])
 def analyze():
@@ -64,14 +68,22 @@ def analyze():
         Keep it friendly, clear and helpful.
         """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}]
-    )
+    client = get_client()
+    if client is None:
+        return jsonify({"error": "GROQ_API_KEY is not set on the server."}), 500
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        analysis = response.choices[0].message.content
+    except Exception as e:
+        return jsonify({"error": f"AI analysis failed: {e}"}), 502
 
     return jsonify({
         "summary": summary,
-        "analysis": response.choices[0].message.content
+        "analysis": analysis
     })
 
 

@@ -40,8 +40,14 @@ function Dashboard() {
     }
     setLoading(true);
     setError("");
-    const data = await analyzeMarks(file, selectedStudent);
-    setLoading(false);
+    let data;
+    try {
+      data = await analyzeMarks(file, selectedStudent);
+    } catch (e) {
+      data = { error: "Something went wrong. Please try again." };
+    } finally {
+      setLoading(false);
+    }
     if (data.error) {
       setError(data.error);
     } else {

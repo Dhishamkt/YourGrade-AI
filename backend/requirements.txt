@@ -2,6 +2,7 @@ flask
 flask-cors
 pandas
 openpyxl
-google-genai
+xlrd
 python-dotenv
 groq
+gunicorn
