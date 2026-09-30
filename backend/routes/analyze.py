@@ -74,7 +74,7 @@ def analyze():
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b"),
             messages=[{"role": "user", "content": prompt}]
         )
         analysis = response.choices[0].message.content
